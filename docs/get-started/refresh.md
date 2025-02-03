@@ -24,10 +24,17 @@ To implement an explicit refresh mechanism, you need to create a new route that 
 ```python
 from pydantic import BaseModel
 from fastapi import FastAPI, Depends, HTTPException
-from authx import AuthX, TokenPayload
+from authx import AuthX, AuthXConfig, TokenPayload
+
+# Create an AuthX configuration
+auth_config = AuthXConfig()
+auth_config.JWT_ALGORITHM = 'HS256'
+auth_config.JWT_SECRET_KEY = 'SECRET_KEY'
+auth_config.JWT_TOKEN_LOCATION = ['headers']
+
 
 app = FastAPI()
-security = AuthX()
+security = AuthX(auth_config)
 
 class LoginForm(BaseModel):
     username: str
@@ -73,8 +80,8 @@ This example provides a basic implementation of an explicit refresh mechanism. I
 
     ```sh
     # We request access to the protected route with the token
-    $ curl -s --oauth2-bearer $TOKEN http://0.0.0.0:8000/sensitive_operation
-    "You have access to this sensitive operation"
+    $ curl -s --oauth2-bearer $TOKEN http://0.0.0.0:8000/protected
+    "You have access to this protected resource"
     ```
 === "3. Refreshing Access Token"
 
